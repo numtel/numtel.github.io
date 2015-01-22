@@ -1,0 +1,21 @@
+
+.container { max-width: 720px; }
+html body { padding-top: 0; }
+
+body a {
+  color: #1d4f23;
+}
+body a:hover {
+  color: #1d7a29;
+}
+
+a.github {
+  float: right;
+  width: 0;
+  height: 0;
+  padding: 50px 50px 0 0;
+  margin: 10px 0;
+  background: url(https://avatars1.githubusercontent.com/u/518698?v=3&s=50) no-repeat 0 0;
+  overflow: hidden;
+  border-radius: 5px;
+}
