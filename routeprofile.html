@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <title>Directions service</title>
+    <style>
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      #map {
+        height: 100%;
+      }
+
+#search {
+  background: rgba(255,255,255,0.7);
+  position: absolute;
+  bottom: 0;
+  z-index: 4;
+  left: 0;
+  width: 100%;
+  height: 50%;
+}
+#chart{
+  width: 100%;
+  height: 100%;
+}
+#search.collapsed {
+  height: 30px;
+}
+#search.collapsed * {
+  display:none;
+}
+#search.collapsed #toggle {
+  display: inherit;
+}
+    </style>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  </head>
+  <body>
+    <form id="search">
+    <input id="start" placeholder="Start">
+    <input id="end" placeholder="End">
+    <input type="submit">
+    <button id="toggle">Toggle Panel</button>
+    <div id="chart"></div>
+    </form>
+    <div id="map"></div>
+    <script>
+google.charts.load('current', {'packages':['corechart']});
+var mapInst = null;
+var marker = null;
+
+function initMap() {
+  var elevator = new google.maps.ElevationService;
+  var directionsService = new google.maps.DirectionsService;
+  var directionsDisplay = new google.maps.DirectionsRenderer;
+  var map = mapInst = new google.maps.Map(document.getElementById('map'), {
+    zoom: 7,
+    center: {lat: 52.2398686, lng:-0.9506092}
+  });
+  directionsDisplay.setMap(map);
+
+  document.getElementById('search').addEventListener('submit', function(event) {
+    event.preventDefault();
+    calculateAndDisplayRoute(elevator, directionsService, directionsDisplay);
+  });
+  document.getElementById('toggle').addEventListener('click', function(event) {
+    event.preventDefault();
+    document.getElementById('search').classList.toggle('collapsed');
+  });
+
+  google.maps.event.addListener(map, 'click', function(event) {
+    var start = document.getElementById('start');
+    var end = document.getElementById('end');
+    var pos = event.latLng.lat() + ', ' + event.latLng.lng();
+    if(start.value.length === 0) {
+      start.value = pos;
+    } else {
+      end.value = pos;
+    }
+  });
+}
+
+function calculateAndDisplayRoute(elevator, directionsService, directionsDisplay) {
+  directionsService.route({
+    origin: document.getElementById('start').value,
+    destination: document.getElementById('end').value,
+    travelMode: google.maps.TravelMode.DRIVING
+  }, function(response, status) {
+    if (status === google.maps.DirectionsStatus.OK) {
+      var routePoints = response.routes.map(function(route) {
+        return route.overview_path.map(function(point) {
+          return {
+            lat: point.lat(),
+            lng: point.lng(),
+            alt: null,
+            dst: null
+          }
+        });
+      });
+
+      routePoints.forEach(function(route) {
+        elevator.getElevationForLocations({
+          'locations': route
+        }, function(results, status) {
+          if (status === google.maps.ElevationStatus.OK) {
+            results.forEach(function(result, index) {
+              route[index].alt = result.elevation;
+              if(index > 0) {
+                route[index].dst = route[index - 1].dst + distance(
+                  route[index - 1].lat,
+                  route[index - 1].lng,
+                  route[index].lat,
+                  route[index].lng);
+              } else {
+                route[index].dst = 0;
+              }
+            });
+            if(marker) {
+              marker.setMap(null);
+              marker = null;
+            }
+            drawChart(route);
+          } else {
+            console.log('Elevation service failed due to: ' + status);
+          }
+        });
+      });
+      directionsDisplay.setDirections(response);
+    } else {
+      window.alert('Directions request failed due to ' + status);
+    }
+  });
+}
+
+function drawChart(route) {
+  var formattedData = route.map(function(point) {
+    return [ point.dst, point.alt ]
+  });
+  formattedData.unshift([ 'Distance', 'Elevation' ]);
+  var data = google.visualization.arrayToDataTable(formattedData);
+
+  var options = {
+    title: 'Route Profile',
+    titlePosition: 'none',
+    backgroundColor: { fill:'transparent' },
+    vAxis: {minValue: 0},
+    legend: {position: 'none'},
+    width: '100%',
+    height: '100%'
+  };
+
+  var chart = new google.visualization.AreaChart(document.getElementById('chart'));
+  chart.draw(data, options);
+  google.visualization.events.addListener(chart, 'onmouseover', function(row, column) {
+    if(marker){
+      marker.setPosition(route[row.row]);
+    } else {
+      marker = new google.maps.Marker({
+        position: route[row.row],
+        map: mapInst
+      });
+    }
+  });
+
+}
+
+// http://stackoverflow.com/questions/27928/calculate-distance-between-two-latitude-longitude-points-haversine-formula
+function distance(lat1, lon1, lat2, lon2) {
+  var p = 0.017453292519943295;    // Math.PI / 180
+  var c = Math.cos;
+  var a = 0.5 - c((lat2 - lat1) * p)/2 +
+          c(lat1 * p) * c(lat2 * p) *
+          (1 - c((lon2 - lon1) * p))/2;
+
+  return 12742 * Math.asin(Math.sqrt(a)); // 2 * R; R = 6371 km
+}
+
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAkNYJ8xxqgNQEIGci35a70kq7_n5UvzWw&signed_in=true&callback=initMap"
+        async defer></script>
+  </body>
+</html>
