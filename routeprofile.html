@@ -5,130 +5,292 @@
     <meta charset="utf-8">
     <title>Directions service</title>
     <style>
-      html, body {
-        height: 100%;
-        margin: 0;
-        padding: 0;
-      }
-      #map {
-        height: 100%;
-      }
-
-#search {
-  background: rgba(255,255,255,0.7);
-  position: absolute;
-  bottom: 0;
-  z-index: 4;
-  left: 0;
-  width: 100%;
-  height: 50%;
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
 }
+#map {
+  height: 100%;
+}
+
 #chart{
   width: 100%;
   height: 100%;
 }
-#search.collapsed {
-  height: 30px;
+
+#waypoints {
+  width: calc(100% - 9px);
+  height: calc(100% - 40px);
+  border: 0;
+  padding: 4px;
+  font-family: sans-serif;
 }
-#search.collapsed * {
+
+.gutter {
+  background-color: #eee;
+
+  background-repeat: no-repeat;
+  background-position: 50%;
+}
+
+.gutter.gutter-vertical {
+  border-top: 1px solid #f5f5f5;
+  border-bottom: 1px solid #ccc;
+  background-color: #e9e9e9;
+  cursor: ns-resize;
+  box-shadow: 3px 0 4px rgba(0,0,0,0.75);
+}
+
+.split {
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-box-sizing: border-box;
+     -moz-box-sizing: border-box;
+          box-sizing: border-box;
+}
+
+
+.tab-handles {
+  background-color: #e9e9e9;
+  padding: 5px 7px 0;
+  overflow:hidden;
+  border-bottom:1px solid #999;
+}
+.tab-handles button {
+  background-color: #ddd;
+  border: 0;
+  border-color: #888;
+  border-style: solid;
+  border-width: 1px 1px 0 1px;
+  border-radius: 3px 3px 0 0;
+  box-shadow: 1px 2px 3px rgba(0,0,0,0.5);
+}
+.tab-handles button.active {
+  background-color: #fff;
+  box-shadow: -1px 2px 3px rgba(0,0,0,0.5);
+}
+.tab {
   display:none;
+  height: calc(100% - 24px);
+  overflow:auto;
 }
-#search.collapsed #toggle {
-  display: inherit;
+.tab.active {
+  display: block;
 }
+
+#tab-waypoints {
+  background: #ccc;
+}
+
+#tab-waypoints span {
+  font-family: sans-serif;
+  font-size: 80%;
+  padding-left: 7px;
+}
+
+#tab-waypoints input {
+  margin-left: 5px;
+}
+
+#tab-profile {
+  overflow: hidden;
+}
+
     </style>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript" src="split.min.js"></script>
   </head>
   <body>
-    <form id="search">
-    <input id="start" placeholder="Start">
-    <input id="end" placeholder="End">
-    <input type="submit">
-    <button id="toggle">Toggle Panel</button>
-    <div id="chart"></div>
-    </form>
-    <div id="map"></div>
+    <div id="search" class="split">
+      <div class="tab-handles">
+        <button data-id="tab-waypoints" class="active">Waypoints</button>
+        <button data-id="tab-profile">Altitude Profile</button>
+        <button data-id="tab-directions">Turn by Turn</button>
+      </div>
+      <form class="tab active" id="tab-waypoints">
+        <textarea id="waypoints"></textarea>
+        <input type="submit"><span>One waypoint per line</span>
+      </form>
+      <div class="tab" id="tab-profile">
+        <div id="chart"></div>
+      </div>
+      <div class="tab" id="tab-directions">
+        <div id="right-panel"></div>
+      </div>
+    </div>
+    <div id="map" class="split"></div>
     <script>
+google.charts.setOnLoadCallback(drawChart);
 google.charts.load('current', {'packages':['corechart']});
 var mapInst = null;
 var marker = null;
+var curRoute = null;
+var txtWaypoint = document.getElementById('waypoints');
+var submitSearch = null;
+var expectHashChange = false;
+
+Split(['#search', '#map'], {
+  sizes: [25, 75],
+  direction: 'vertical',
+  onDragEnd: function() {
+    resizeThrottler();
+  }
+});
+
+var tabs = document.querySelectorAll('.tab-handles button');
+Array.prototype.forEach.call(tabs, function(button) {
+  button.addEventListener('click', function(event) {
+    Array.prototype.forEach.call(tabs, function(aButton) {
+      var panel = document.getElementById(aButton.dataset.id)
+      if(aButton === button) {
+        aButton.classList.add('active');
+        panel.classList.add('active');
+      } else {
+        aButton.classList.remove('active');
+        panel.classList.remove('active');
+      }
+    });
+  }, false);
+});
+
+window.addEventListener("resize", resizeThrottler, false);
+
+var resizeTimeout;
+function resizeThrottler() {
+  // ignore resize events as long as an execution is in the queue
+  if ( !resizeTimeout ) {
+    resizeTimeout = setTimeout(function() {
+      resizeTimeout = null;
+      drawChart();
+     // execute at a rate of 15fps
+     }, 66);
+  }
+}
+
+function readPageHash() {
+  if(expectHashChange) {
+    expectHashChange = false;
+  } else if(document.location.hash.substr(0, 2) === '#!') {
+    txtWaypoint.value = b64_to_utf8(document.location.hash.substr(2));
+    submitSearch && submitSearch();
+  }
+}
 
 function initMap() {
-  var elevator = new google.maps.ElevationService;
-  var directionsService = new google.maps.DirectionsService;
-  var directionsDisplay = new google.maps.DirectionsRenderer;
   var map = mapInst = new google.maps.Map(document.getElementById('map'), {
     zoom: 7,
     center: {lat: 52.2398686, lng:-0.9506092}
   });
+  var elevator = new google.maps.ElevationService;
+  var directionsService = new google.maps.DirectionsService;
+  var directionsDisplay = new google.maps.DirectionsRenderer({
+    draggable: true,
+    map: map,
+    panel: document.getElementById('right-panel')
+  });
   directionsDisplay.setMap(map);
+  directionsDisplay.addListener('directions_changed', function() {
+    var newDirections = directionsDisplay.getDirections();
+    formatDirectionsToPoints(newDirections, elevator, drawChart);
+    var newDescription = newDirections.routes.map(function(route) {
+      return route.legs.map(function(leg, index) {
+        var points = [];
+        if(index === 0
+            || route.legs[index - 1].end_address !== leg.start_address) {
+          points.push(leg.start_address);
+        }
 
-  document.getElementById('search').addEventListener('submit', function(event) {
-    event.preventDefault();
+        points = points.concat(leg.via_waypoints.map(function(waypoint) {
+          return waypoint.lat() + ', ' + waypoint.lng()
+        }));
+
+        points.push(leg.end_address);
+        return points.join('\n');
+      }).join('\n');
+    }).join('\n');
+    txtWaypoint.value = newDescription;
+    expectHashChange = true;
+    document.location.hash = '!' + utf8_to_b64(newDescription);
+  });
+
+  submitSearch = function(event) {
+    event && event.preventDefault();
     calculateAndDisplayRoute(elevator, directionsService, directionsDisplay);
-  });
-  document.getElementById('toggle').addEventListener('click', function(event) {
-    event.preventDefault();
-    document.getElementById('search').classList.toggle('collapsed');
-  });
+  };
+
+  window.addEventListener('hashchange', readPageHash, false);
+  readPageHash();
+
+  document.getElementById('search').addEventListener('submit', submitSearch);
 
   google.maps.event.addListener(map, 'click', function(event) {
-    var start = document.getElementById('start');
-    var end = document.getElementById('end');
     var pos = event.latLng.lat() + ', ' + event.latLng.lng();
-    if(start.value.length === 0) {
-      start.value = pos;
-    } else {
-      end.value = pos;
-    }
+    txtWaypoint.value += '\n' + pos;
+  });
+}
+
+function formatDirectionsToPoints(response, elevator, callback) {
+  var routePoints = response.routes.map(function(route) {
+    return route.overview_path.map(function(point) {
+      return {
+        lat: point.lat(),
+        lng: point.lng(),
+        alt: null,
+        dst: null
+      }
+    });
+  });
+
+  routePoints.forEach(function(route) {
+    elevator.getElevationForLocations({
+      'locations': route
+    }, function(results, status) {
+      if (status === google.maps.ElevationStatus.OK) {
+        results.forEach(function(result, index) {
+          route[index].alt = result.elevation;
+          if(index > 0) {
+            route[index].dst = route[index - 1].dst + distance(
+              route[index - 1].lat,
+              route[index - 1].lng,
+              route[index].lat,
+              route[index].lng);
+          } else {
+            route[index].dst = 0;
+          }
+        });
+        if(marker) {
+          marker.setMap(null);
+          marker = null;
+        }
+        curRoute = route;
+        callback && callback(route);
+      } else {
+        console.log('Elevation service failed due to: ' + status);
+      }
+    });
   });
 }
 
 function calculateAndDisplayRoute(elevator, directionsService, directionsDisplay) {
+  var waypoints = txtWaypoint.value.split('\n').filter(function(value) {
+    return value !== '';
+  });
+
+  if(waypoints.length < 2) {
+    return alert('Must have at least two waypoints!');
+  }
   directionsService.route({
-    origin: document.getElementById('start').value,
-    destination: document.getElementById('end').value,
+    origin: waypoints.shift(),
+    destination: waypoints.pop(),
+    waypoints: waypoints.map(function(waypoint) {
+      return { location: waypoint }
+    }),
     travelMode: google.maps.TravelMode.DRIVING
   }, function(response, status) {
     if (status === google.maps.DirectionsStatus.OK) {
-      var routePoints = response.routes.map(function(route) {
-        return route.overview_path.map(function(point) {
-          return {
-            lat: point.lat(),
-            lng: point.lng(),
-            alt: null,
-            dst: null
-          }
-        });
-      });
+      formatDirectionsToPoints(response, elevator, drawChart);
 
-      routePoints.forEach(function(route) {
-        elevator.getElevationForLocations({
-          'locations': route
-        }, function(results, status) {
-          if (status === google.maps.ElevationStatus.OK) {
-            results.forEach(function(result, index) {
-              route[index].alt = result.elevation;
-              if(index > 0) {
-                route[index].dst = route[index - 1].dst + distance(
-                  route[index - 1].lat,
-                  route[index - 1].lng,
-                  route[index].lat,
-                  route[index].lng);
-              } else {
-                route[index].dst = 0;
-              }
-            });
-            if(marker) {
-              marker.setMap(null);
-              marker = null;
-            }
-            drawChart(route);
-          } else {
-            console.log('Elevation service failed due to: ' + status);
-          }
-        });
-      });
       directionsDisplay.setDirections(response);
     } else {
       window.alert('Directions request failed due to ' + status);
@@ -137,15 +299,26 @@ function calculateAndDisplayRoute(elevator, directionsService, directionsDisplay
 }
 
 function drawChart(route) {
-  var formattedData = route.map(function(point) {
+  if(!route) route = curRoute;
+  if(!route || !google.visualization) return;
+
+  var totalClimbing = 0;
+  var totalDescending = 0;
+  var formattedData = route.map(function(point, index) {
+    if(index > 0 && point.alt > route[index - 1].alt) {
+      totalClimbing += point.alt - route[index - 1].alt;
+    } else if(index > 0 && point.alt < route[index - 1].alt) {
+      totalDescending += route[index - 1].alt - point.alt;
+    }
     return [ point.dst, point.alt ]
   });
   formattedData.unshift([ 'Distance', 'Elevation' ]);
   var data = google.visualization.arrayToDataTable(formattedData);
 
   var options = {
-    title: 'Route Profile',
-    titlePosition: 'none',
+    title: (Math.round(route[route.length - 1].dst * 100) / 100) + ' km - ' +
+      Math.round(totalClimbing * 100) / 100 + ' m Climbing - ' +
+      Math.round(totalDescending * 100) / 100 + ' m Descending',
     backgroundColor: { fill:'transparent' },
     vAxis: {minValue: 0},
     legend: {position: 'none'},
@@ -177,6 +350,14 @@ function distance(lat1, lon1, lat2, lon2) {
           (1 - c((lon2 - lon1) * p))/2;
 
   return 12742 * Math.asin(Math.sqrt(a)); // 2 * R; R = 6371 km
+}
+
+function utf8_to_b64(str) {
+  return window.btoa(escape(encodeURIComponent(str)));
+}
+
+function b64_to_utf8(str) {
+  return decodeURIComponent(unescape(window.atob(str)));
 }
 
     </script>
