@@ -81,16 +81,17 @@ html, body {
 
 #tab-waypoints {
   background: #ccc;
-}
-
-#tab-waypoints span {
   font-family: sans-serif;
   font-size: 80%;
-  padding-left: 7px;
 }
 
-#tab-waypoints input {
-  margin-left: 5px;
+@media (max-width: 400px) {
+  #waypoints {
+    height: calc(100% - 60px);
+  }
+  #tab-waypoints span {
+    display:block;
+  }
 }
 
 #tab-profile {
@@ -110,7 +111,14 @@ html, body {
       </div>
       <form class="tab active" id="tab-waypoints">
         <textarea id="waypoints"></textarea>
-        <input type="submit"><span>One waypoint per line</span>
+        <label><input id="avoid-highways" type="checkbox"> Avoid Highways</label>
+        <select id="direction-mode">
+          <option value="DRIVING">Driving</option>
+          <option value="WALKING">Walking</option>
+          <option value="BICYCLING">Bicycling</option>
+          <option value="TRANSIT">Transit</option>
+        </select>
+        <span><input type="submit"> One waypoint per line</span>
       </form>
       <div class="tab" id="tab-profile">
         <div id="chart"></div>
@@ -127,6 +135,8 @@ var mapInst = null;
 var marker = null;
 var curRoute = null;
 var txtWaypoint = document.getElementById('waypoints');
+var chkAvoidHighways = document.getElementById('avoid-highways');
+var lstDirectionMode = document.getElementById('direction-mode');
 var submitSearch = null;
 var expectHashChange = false;
 
@@ -146,6 +156,7 @@ Array.prototype.forEach.call(tabs, function(button) {
       if(aButton === button) {
         aButton.classList.add('active');
         panel.classList.add('active');
+        if(aButton.dataset.id === 'tab-profile') drawChart();
       } else {
         aButton.classList.remove('active');
         panel.classList.remove('active');
@@ -172,7 +183,16 @@ function readPageHash() {
   if(expectHashChange) {
     expectHashChange = false;
   } else if(document.location.hash.substr(0, 2) === '#!') {
-    txtWaypoint.value = b64_to_utf8(document.location.hash.substr(2));
+    var hashContent = b64_to_utf8(document.location.hash.substr(2));
+    if(hashContent.substr(0, 1) === '{') {
+      hashContent = JSON.parse(hashContent);
+
+      txtWaypoint.value = hashContent.waypoints;
+      chkAvoidHighways.checked = hashContent.avoidHighways ? 'checked' : null;
+      lstDirectionMode.value = hashContent.mode;
+    } else {
+      txtWaypoint.value = hashContent;
+    }
     submitSearch && submitSearch();
   }
 }
@@ -211,7 +231,12 @@ function initMap() {
     }).join('\n');
     txtWaypoint.value = newDescription;
     expectHashChange = true;
-    document.location.hash = '!' + utf8_to_b64(newDescription);
+    var newHashContent = JSON.stringify({
+      waypoints: newDescription,
+      avoidHighways: chkAvoidHighways.checked ? true : false,
+      mode: lstDirectionMode.value
+    });
+    document.location.hash = '!' + utf8_to_b64(newHashContent);
   });
 
   submitSearch = function(event) {
@@ -286,7 +311,8 @@ function calculateAndDisplayRoute(elevator, directionsService, directionsDisplay
     waypoints: waypoints.map(function(waypoint) {
       return { location: waypoint }
     }),
-    travelMode: google.maps.TravelMode.DRIVING
+    travelMode: google.maps.TravelMode[lstDirectionMode.value],
+    avoidHighways: chkAvoidHighways.checked
   }, function(response, status) {
     if (status === google.maps.DirectionsStatus.OK) {
       formatDirectionsToPoints(response, elevator, drawChart);
