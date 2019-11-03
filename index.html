@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <html>
+<html lang="en">
 <head>
-  <link rel="stylesheet" type="text/css" href="styles.css">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <title>Web Development by Ben Green</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" type="text/css" href="styles.css">
 </head>
 <body>
   <div class="navbar">
@@ -14,122 +17,165 @@
       </div>
     </div>
   </div>
-  <xmp theme="journal" style="display:none;">
-Email: [ben@latenightsketches.com](mailto:ben@latenightsketches.com)
+  <div class="container" id="content">
+    <p>Email: <a href="mailto:ben@latenightsketches.com">ben@latenightsketches.com</a></p>
+    <p>Github: <a href="https://github.com/numtel">github.com/numtel</a></p>
+    <p>LinkedIn: <a href="https://www.linkedin.com/in/numtel/">linkedin.com/in/numtel</a></p>
+    <details>
+      <summary>Node.js Packages</summary>
+      <ul>
+        <li>
+          <p><a href="https://github.com/numtel/progress-promise">progress-promise</a></p>
+          <p>Promise subclass with mechanism to report progress before resolving </p>
+        </li>
+        <li>
+          <p><a href="https://github.com/numtel/node-nano-node">nonde-nano-node</a></p>
+          <p>Node.js Nano Currency Partial Node</p>
+         </li>
+         <li>
+          <p><a href="https://github.com/numtel/nano-webgl-pow">nano-webgl-pow</a></p>
+          <p>Nano WebGL Proof of Work Generator</p>
+          </li>
 
-Github: [github.com/numtel](https://github.com/numtel)
+          <li>
+              <p><a href="https://github.com/numtel/pg-live-select">pg-live-select</a></p>
+              <p>Provide events on updated PostgreSQL <code class="prettyprint lang- prettyprinted" style=""><span class="pln">SELECT</span></code> result sets</p>
+          </li>
+          <li>
+              <p><a href="https://github.com/numtel/mysql-live-select">mysql-live-select</a></p>
+              <p>Provide events on updated MySQL <code class="prettyprint lang- prettyprinted" style=""><span class="pln">SELECT</span></code> result sets</p>
+          </li>
+          <li>
+              <p><a href="https://github.com/numtel/sails-mysql-live-select">sails-mysql-live-select</a></p>
+              <p>Sails.js integration for mysql-live-select</p>
+          </li>
+          <li>
+              <p><a href="https://github.com/nevill/zongji">zongji</a></p>
+              <p>MySQL binary log tailer for Node.js</p>
+          </li>
+      </ul>
+    </details>
+    <details>
+      <summary>Meteor Packages</summary>
+      <ul>
+        <li>
+          <p><a href="https://github.com/numtel/meteor-cfs-image-resize">meteor-cfs-image-resize</a></p>
+          <p>Resize images in CollectionFS using Jimp</p>
+          </li>
+          <li>
+              <p><a href="https://github.com/numtel/meteor-lazy-bundles">numtel:lazy-bundles</a></p>
+              <p>Create bundles for lazy-loading components, optionally with authentication</p>
+          </li>
+          <li>
+              <p><a href="https://github.com/numtel/meteor-pg">numtel:pg</a></p>
+              <p>Reactive PostgreSQL <code class="prettyprint lang- prettyprinted" style=""><span class="pln">SELECT</span></code> statement result sets</p>
+          </li>
+          <li>
+              <p><a href="https://github.com/numtel/meteor-pg-server">numtel:pg-server</a></p>
+              <p>Run PostgreSQL server inside your Meteor app</p>
+          </li>
+          <li>
+              <p><a href="https://github.com/numtel/meteor-mysql">numtel:mysql</a></p>
+              <p>Reactive MySQL <code class="prettyprint lang- prettyprinted" style=""><span class="pln">SELECT</span></code> statement result sets</p>
+          </li>
+          <li>
+              <p><a href="https://github.com/numtel/meteor-mysql-server">numtel:mysql-server</a></p>
+              <p>Run MySQL server inside your Meteor app</p>
+          </li>
+          <li>
+              <p><a href="https://github.com/numtel/meteor-webcomponent">numtel:webcomponent</a></p>
+              <p>Using Polymer's underlying <code class="prettyprint lang- prettyprinted" style=""><span class="pln">webcomponents</span><span class="pun">.</span><span class="pln">js</span></code> polyfill library, convert any Meteor template into a custom element</p>
+          </li>
+          <li>
+              <p><a href="https://github.com/numtel/meteor-benchmark-packages">numtel:benchmark-packages</a></p>
+              <p>Perform benchmarks while testing your Meteor packages</p>
+          </li>
+          <li>
+              <p><a href="https://github.com/numtel/meteor-phantomjs-persistent-server">numtel:phantomjs-persistent-server</a></p>
+              <p>PhantomJS daemon to allow performing operations without having to start new instance for each operation</p>
+          </li>
+          <li>
+              <p><a href="https://github.com/numtel/meteor-template-from-string">numtel:template-from-string</a></p>
+              <p>Create Meteor templates from string instead of from an <code class="prettyprint lang- prettyprinted" style=""><span class="pln">html</span></code> file</p>
+          </li>
+      </ul>
+    </details>
+    <details>
+      <summary>Example Applications</summary>
+      <ul>
+        <li>
+          <p><a href="https://github.com/numtel/beach-report-lite">Beach Report Lite</a></p>
+          <p>Lightweight version of beachreportcard.com</p>
+        </li>
+        <li>
+          <p><a href="https://github.com/numtel/example-lithtml-wizard">Example Wizard Style Application using Lit-html</a></p>
+        </li>
+        <li>
+          <p><a href="https://github.com/numtel/three-js-lathe-twist">Three.js lathe twist</a></p>
+          <p>Standard lathe example but modified with a twist in order to model teardrop-ish shapes.</p>
+        </li>
+        <li>
+          <p><a href="https://github.com/numtel/nano-mass-tx">Nano currency transaction sequence tester</a></p>
+        </li>
+          <li>
+              <p><a href="https://github.com/numtel/reactive-mysql-example">Reactive MySQL example</a></p>
+              <p>Scoreboard application made using <code class="prettyprint lang- prettyprinted" style=""><span class="pln">mysql</span><span class="pun">-</span><span class="pln">live</span><span class="pun">-</span><span class="kwd">select</span></code>, Express, SockJS, and React</p>
+          </li>
+          <li>
+              <p><a href="https://github.com/numtel/meteor-leaderboard-tinytest">How to use Tinytest to test a Meteor application</a></p>
+              <p>No extra packages needed, just write a <code class="prettyprint lang- prettyprinted" style=""><span class="kwd">package</span><span class="pun">.</span><span class="pln">json</span></code> file!</p>
+          </li>
+          <li>
+              <p><a href="https://github.com/numtel/sails-mysql-live-select-chat-example">Sails.js Chat Application with real time MySQL backend</a></p>
+              <p>Chat room example application with live real time data from MySQL using mysql-live-select</p>
+          </li>
+      </ul>
+    </details>
+    <details>
+      <summary>Other Projects</summary>
+      <ul>
+        <li>
+          <p><a href="https://github.com/numtel/open-nano-wallet">Open Nano Wallet</a></p>
+          <p>No longer under active development</p>
+         </li>
+         <li>
+          <p><a href="https://github.com/numtel/rai-paper-wallet">Nano paper wallet generator</a></p>
+          </li>
 
-LinkedIn: [linkedin.com/in/numtel](https://www.linkedin.com/in/numtel/)
-
-## Meteor Packages
-
-* [numtel:lazy-bundles](https://github.com/numtel/meteor-lazy-bundles)
-
-  Create bundles for lazy-loading components, optionally with authentication
-
-* [numtel:pg](https://github.com/numtel/meteor-pg)
-
-  Reactive PostgreSQL `SELECT` statement result sets
-
-* [numtel:pg-server](https://github.com/numtel/meteor-pg-server)
-
-  Run PostgreSQL server inside your Meteor app
-
-* [numtel:mysql](https://github.com/numtel/meteor-mysql)
-
-  Reactive MySQL `SELECT` statement result sets
-
-* [numtel:mysql-server](https://github.com/numtel/meteor-mysql-server)
-
-  Run MySQL server inside your Meteor app
-
-* [numtel:webcomponent](https://github.com/numtel/meteor-webcomponent)
-
-  Using Polymer's underlying `webcomponents.js` polyfill library, convert any Meteor template into a custom element
-
-* [numtel:benchmark-packages](https://github.com/numtel/meteor-benchmark-packages)
-
-  Perform benchmarks while testing your Meteor packages
-
-* [numtel:phantomjs-persistent-server](https://github.com/numtel/meteor-phantomjs-persistent-server)
-
-  PhantomJS daemon to allow performing operations without having to start new instance for each operation
-
-* [numtel:template-from-string](https://github.com/numtel/meteor-template-from-string)
-
-  Create Meteor templates from string instead of from an `html` file
-
-## Node.js Packages
-
-* [pg-live-select](https://github.com/numtel/pg-live-select)
-
-  Provide events on updated PostgreSQL `SELECT` result sets
-
-* [mysql-live-select](https://github.com/numtel/mysql-live-select)
-
-  Provide events on updated MySQL `SELECT` result sets
-
-* [sails-mysql-live-select](https://github.com/numtel/sails-mysql-live-select)
-
-  Sails.js integration for mysql-live-select
-
-* [zongji](https://github.com/nevill/zongji)
-
-  MySQL binary log tailer for Node.js
-
-## Example Applications
-
-* [Reactive MySQL example](https://github.com/numtel/reactive-mysql-example)
-
-  Scoreboard application made using `mysql-live-select`, Express, SockJS, and React
-
-* [How to use Tinytest to test a Meteor application](https://github.com/numtel/meteor-leaderboard-tinytest)
-
-  No extra packages needed, just write a `package.json` file!
-
-* [Sails.js Chat Application with real time MySQL backend](https://github.com/numtel/sails-mysql-live-select-chat-example)
-
-  Chat room example application with live real time data from MySQL using mysql-live-select
-
-## Other Projects
-
-* [Shadow Styles Library](https://github.com/numtel/shadowstyles)
-
-  CSS Isolation for any element or for polyfilled Shadow DOM CSS Isolation in conjunction with Polymer's `webcomponents.js`
-
-* [Snorb Terrain Editor](http://numtel.github.io/snorb/)
-
-  Made with Three.js and WebGL, [see repository](https://github.com/numtel/snorb)
-
-## Media
-
-* [Meteor Interviews - SQL and Meteor](http://www.meteorinterviews.com/8)
-
-  Podcast interview with Paul Dowman from OK GROW!
-
-* [Meteor Beyond Mongo: A Look at reactive PostgreSQL](https://www.youtube.com/watch?v=B5HT2PTYtuE)
-
-  From Meteor Devshop SF April 2015 - *The demonstrated memory leak has since been fixed!*
-
-* [Exploring lazy-loaded templates + Updated MySQL package](https://www.youtube.com/watch?v=zSI68J9wNJ0)
-
-  From Meteor Devshop SF January 2015
-
-* [Exploring Reactive MySQL](https://www.youtube.com/watch?v=EJzulpXZn6g)
-
-  From Meteor Devshop SF December 2014
-
-  </xmp>
-  <script src="strapdown/strapdown.js"></script>
-  <script>
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-    ga('create', 'UA-61951627-1', 'auto');
-    ga('send', 'pageview');
-
-  </script>
+          <li>
+              <p><a href="https://github.com/numtel/shadowstyles">Shadow Styles Library</a></p>
+              <p>CSS Isolation for any element or for polyfilled Shadow DOM CSS Isolation in conjunction with Polymer's <code class="prettyprint lang- prettyprinted" style=""><span class="pln">webcomponents</span><span class="pun">.</span><span class="pln">js</span></code></p>
+          </li>
+          <li>
+              <p><a href="http://numtel.github.io/snorb/">Snorb Terrain Editor</a></p>
+              <p>Made with Three.js and WebGL, <a href="https://github.com/numtel/snorb">see repository</a></p>
+          </li>
+      </ul>
+    </details>
+    <details>
+      <summary>Media</summary>
+      <ul>
+        <li>
+          <p><a href="http://latenightsketches.com/">Late Night Sketches</a></p>
+        </li>
+          <li>
+              <p><a href="http://www.meteorinterviews.com/8">Meteor Interviews - SQL and Meteor</a></p>
+              <p>Podcast interview with Paul Dowman from OK GROW!</p>
+          </li>
+          <li>
+              <p><a href="https://www.youtube.com/watch?v=B5HT2PTYtuE">Meteor Beyond Mongo: A Look at reactive PostgreSQL</a></p>
+              <p>From Meteor Devshop SF April 2015 - <em>The demonstrated memory leak has since been fixed!</em></p>
+          </li>
+          <li>
+              <p><a href="https://www.youtube.com/watch?v=zSI68J9wNJ0">Exploring lazy-loaded templates + Updated MySQL package</a></p>
+              <p>From Meteor Devshop SF January 2015</p>
+          </li>
+          <li>
+              <p><a href="https://www.youtube.com/watch?v=EJzulpXZn6g">Exploring Reactive MySQL</a></p>
+              <p>From Meteor Devshop SF December 2014</p>
+          </li>
+      </ul>
+    </details>
+</div>
 </body>
 </html>

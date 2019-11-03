@@ -1,11 +1,14 @@
 
-.container { max-width: 720px; }
-html body { padding-top: 0; }
+body { max-width: 720px;  padding-top: 0; background-color: #eee; }
 
-body a {
+body a,
+summary {
+  text-decoration: underline;
   color: #1d4f23;
+  cursor: pointer;
 }
-body a:hover {
+body a:hover,
+summary:hover {
   color: #1d7a29;
 }
 
