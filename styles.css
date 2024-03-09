@@ -1,5 +1,10 @@
 
-body { max-width: 720px;  padding-top: 0; background-color: #eee; }
+body {
+  max-width: 720px;  padding-top: 0; background-color: #eee;
+  font-family: "Merriweather", serif;
+  font-weight: 400;
+  font-style: normal;
+}
 
 body a,
 summary {
@@ -10,6 +15,9 @@ summary {
 body a:hover,
 summary:hover {
   color: #1d7a29;
+}
+summary {
+  padding:5px 0;
 }
 
 a.github {
@@ -22,3 +30,8 @@ a.github {
   overflow: hidden;
   border-radius: 5px;
 }
+
+#headline {
+  font-size: 1.2rem;
+}
+
