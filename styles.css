@@ -35,3 +35,18 @@ a.github {
   font-size: 1.2rem;
 }
 
+#major {
+  list-style: none;
+  padding: 0;
+}
+#major li {
+  display: flex;
+  padding: 10px;
+}
+
+#major img {
+  max-width: 128px;
+}
+#major li>div {
+  padding: 0 10px;
+}
