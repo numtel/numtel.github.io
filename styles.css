@@ -45,7 +45,8 @@ a.github {
 }
 
 #major img {
-  max-width: 128px;
+  width: 128px;
+  height: 128px;
 }
 #major li>div {
   padding: 0 10px;
