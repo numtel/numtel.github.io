@@ -1,6 +1,9 @@
 
 body {
-  max-width: 720px;  padding-top: 0; background-color: #eee;
+  max-width: 720px;  padding-top: 0;
+  background: linear-gradient(180deg, #1d4f23 0, #ccb 0.3rem, #eee 100%);
+  background-repeat: no-repeat;
+  background-color: #eee;
   font-family: "Merriweather", serif;
   font-weight: 400;
   font-style: normal;
@@ -32,7 +35,16 @@ a.github {
 }
 
 #headline {
-  font-size: 1.2rem;
+  font-size: 1.6rem;
+}
+#sen {
+  position:absolute;
+  color: #dfff00;
+  margin-left: -1.45rem;
+  margin-top: -0.6rem;
+  text-shadow: 0 0 5px #b64357;
+  font-size: 150%;
+  transform: rotate(-15deg);
 }
 
 #major {
